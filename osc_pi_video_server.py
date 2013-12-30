@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from liblo import *
-import sys, os, subprocess, re
+import sys, os, subprocess, re, datetime, time
 
 class OscPiVideoServer(ServerThread):
     target_addr = '192.168.1.2'
@@ -163,6 +163,8 @@ class OscPiVideoServer(ServerThread):
 OscFileGrid class
 """
 class OscFileGrid():
+    total_grid_seconds = 0
+
     def __init__(self):
         self.extensions = ('.mov')
         self.grid_size = 16
@@ -200,7 +202,9 @@ class OscFileGrid():
         match = pattern.search(stderr)
         print match.group()
         if match:
-            x = match.group()
+            a = time.strptime(match.group(), '%H:%M:%S')
+            x = datetime.timedelta(hours=a.tm_hour, minutes=a.tm_min, seconds=a.tm_sec).seconds
+            OscFileGrid.total_grid_seconds += x
         else:
             x = 0
         return x
@@ -234,9 +238,8 @@ class OscFileGrid():
             label = "/1/label" + str(labelVal)
             send(OscPiVideoServer.target, label, filename)
             labelVal = labelVal + 1
-            label = "/1/label" + str(labelVal)
-            send(OscPiVideoServer.target, label, self.found_file_times[filename])
-
+            label = "/1/label" + str(labelVal) 
+            send( OscPiVideoServer.target, label, str(datetime.timedelta(seconds=self.found_file_times[filename])) )
             print "%s filename: %s" % (label, filename)
 
 """
@@ -269,9 +272,11 @@ class OscTxtLabels():
         labelValz = [44, 'Current', 'Total', 41, 42, 84, 'Loop', 'StartStop']
         for label in labelValz:
             if label == 44:
-                OscTxtLabels.setLabel(self, label, '###### ######')
-            elif label == 'Current' or label == 'Total':
+                OscTxtLabels.setLabel(self, label, '')
+            elif label == 'Current':
                 OscTxtLabels.setLabel(self, label, '0:00')
+            elif label == 'Total':
+                OscTxtLabels.setLabel(self, label, str(datetime.timedelta(seconds=OscFileGrid.total_grid_seconds)) )
             elif label == 41 or label == 42 or label == 84:
                 OscTxtLabels.setLabel(self, label, '')
             elif label == 'Loop':
