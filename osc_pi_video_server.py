@@ -25,21 +25,29 @@ class OscPiVideoServer(ServerThread):
     @make_method('/1/multipush1/1/1', None)
     def l1_callback(self, path, args):
         if args == [1.0]:
-            print "label1 GOT A ONE!"
+            f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[0]
+            subprocess.Popen(['sudo', 'omxplayer', f])
+            print "label1 GOT A ONE: %s" % f
 
     @make_method('/1/multipush1/2/1', None)
     def l2_callback(self, path, args):
         if args == [1.0]:
+            f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[1]
+            subprocess.Popen(['sudo', 'omxplayer', f])
             print "label2 GOT A ONE!"
 
     @make_method('/1/multipush1/3/1', None)
     def l3_callback(self, path, args):
         if args == [1.0]:
+            f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[2]
+            subprocess.Popen(['sudo', 'omxplayer', f])
             print "label3 GOT A ONE!"
 
     @make_method('/1/multipush1/4/1', None)
     def l4_callback(self, path, args):
         if args == [1.0]:
+            f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[3]
+            subprocess.Popen(['sudo', 'omxplayer', f])
             print "label4 GOT A ONE!"
     
     #ROW 2
@@ -221,6 +229,9 @@ class OscFileGrid():
 
     def getGridItemValuesAtOffset(self, offset):
         return self.found_files.values()[ offset : (offset + self.grid_size) ]
+    
+    def getGridItemKeysAtOffset(self, offset):
+        return self.found_files.keys()[ offset : (offset + self.grid_size) ]
 
     def initGrid(self):
         labelVal = 0
