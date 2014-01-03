@@ -14,6 +14,8 @@ class OscPiVideoServer(ServerThread):
         OscTxtLabels.initP2Labels(self.labels)
         OscTxtLabels.initP1Labels(self.labels)
 
+    def play_video(self, f):
+        subprocess.Popen(['sudo', 'omxplayer', f])
 
     @make_method('/1', None)
     def p1_callback(self, path, args):
@@ -26,28 +28,28 @@ class OscPiVideoServer(ServerThread):
     def l1_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[0]
-            subprocess.Popen(['sudo', 'omxplayer', f])
+            play_video(f)
             print "label1 GOT A ONE: %s" % f
 
     @make_method('/1/multipush1/2/1', None)
     def l2_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[1]
-            subprocess.Popen(['sudo', 'omxplayer', f])
+            play_video(f)
             print "label2 GOT A ONE!"
 
     @make_method('/1/multipush1/3/1', None)
     def l3_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[2]
-            subprocess.Popen(['sudo', 'omxplayer', f])
+            play_video(f)
             print "label3 GOT A ONE!"
 
     @make_method('/1/multipush1/4/1', None)
     def l4_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[3]
-            subprocess.Popen(['sudo', 'omxplayer', f])
+            play_video(f)
             print "label4 GOT A ONE!"
     
     #ROW 2
