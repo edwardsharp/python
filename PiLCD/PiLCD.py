@@ -41,10 +41,11 @@ def myScrollDisplayLeft():
 
 """ MAIN FUNCTIONZ """
 IDX = 0
-FUNCTIONZ = [['list files', 'ls'], 
-             ['pure data', 'pd'],
-             ['video player', 'omxplayer'], 
-             ['shutdown', 'shutdown -h now']]
+FUNCTIONZ = [['lxterminal', 'open .sh filez'], 
+             ['pure data', 'open .pd filez'],
+             ['omxplayer', ' open .mov filez'], 
+             ['shutdown', 'shutdown NOW']]
+
 def setNextFunc():
   global IDX, FUNCTIONZ
   IDX = IDX + 1
@@ -58,10 +59,11 @@ def getCurrentFunc():
 
 """ SUB FUNCTIONZ """
 SUB_IDX00 = -1
-SUB_FUNCTIONZ00 = [['ls', '/home/pi'], 
-                 ['ls', '/home/pi/Desktop'], 
-                 ['ls', '/home/pi/videos'], 
-                 ['ls', '/mnt/media']]
+SUB_FUNCTIONZ00 = []
+for root, dirs, files in os.walk('/home/pi'):
+  for file in files:
+    if file.endswith('.sh'):
+      SUB_FUNCTIONZ00.append(['lxterminal -e', os.path.join(root, file)])
 
 SUB_IDX01 = -1
 SUB_FUNCTIONZ01 = []
@@ -133,6 +135,8 @@ def getCurrentSubFunc():
     sub_string = 'shutdown -h now'
   return sub_string
 
+
+""" SELECT BUTTON """
 def makeSelection(button):
   global lcd, prev, SUB_IDX01, SUB_FUNCTIONZ01, SUB_IDX02, SUB_FUNCTIONZ02
   lcd.clear()
@@ -154,19 +158,12 @@ def makeSelection(button):
   #end flash
   lcd.clear()
   lcd.message(getCurrentFunc()+'\n'+getCurrentSubFunc())
-
   print getCurrentSubFunc()
-  # Set up the echo command and direct the output to a pipe
-  p1 = subprocess.Popen([getCurrentSubFunc()], stdout=subprocess.PIPE)
-
-  # Run the command
-  output = p1.communicate()[0]
-  print output
-  prev = -1
-
+  #
+  subprocess.call(getCurrentSubFunc(), shell=True)
   lcd.clear()
-  lcd.message(getCurrentSubFunc()+':\n'+output)
-
+  lcd.message('called:\n'+getCurrentSubFunc())
+  prev = -1
 
 mySleep(1)
 
