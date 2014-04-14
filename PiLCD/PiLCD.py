@@ -3,6 +3,8 @@
 from time import sleep
 from Adafruit_CharLCDPlate import Adafruit_CharLCDPlate
 
+import subprocess, glob, os
+
 # Initialize the LCD plate.  Should auto-detect correct I2C bus.  If not,
 # pass '0' for early 256 MB Model B boards or '1' for all later versions
 lcd = Adafruit_CharLCDPlate()
@@ -39,9 +41,10 @@ def myScrollDisplayLeft():
 
 """ MAIN FUNCTIONZ """
 IDX = 0
-FUNCTIONZ = [['NameTop0', 'SubFunc00'], 
-             ['NameTop1', 'SubFunc01'], 
-             ['NameTop2', 'SubFunc02']]
+FUNCTIONZ = [['list files', 'ls'], 
+             ['pure data', 'pd'],
+             ['video player', 'omxplayer'], 
+             ['shutdown', 'shutdown -h now']]
 def setNextFunc():
   global IDX, FUNCTIONZ
   IDX = IDX + 1
@@ -55,14 +58,27 @@ def getCurrentFunc():
 
 """ SUB FUNCTIONZ """
 SUB_IDX00 = -1
-SUB_FUNCTIONZ00 = [['name0', 'cmd0'], 
-                 ['name1', 'cmd1'], 
-                 ['name2', 'cmd2'], 
-                 ['name3', 'cmd3'], 
-                 ['name4', 'cmd4']]
+SUB_FUNCTIONZ00 = [['ls', '/home/pi'], 
+                 ['ls', '/home/pi/Desktop'], 
+                 ['ls', '/home/pi/videos'], 
+                 ['ls', '/mnt/media']]
+
+SUB_IDX01 = -1
+SUB_FUNCTIONZ01 = []
+for root, dirs, files in os.walk('/home/pi'):
+  for file in files:
+    if file.endswith('.pd'):
+      SUB_FUNCTIONZ01.append(['pd', os.path.join(root, file)])
+
+SUB_IDX02 = -1
+SUB_FUNCTIONZ02 = []
+for root, dirs, files in os.walk('/home/pi'):
+  for file in files:
+    if file.endswith('.mov'):
+      SUB_FUNCTIONZ02.append(['omxplayer', os.path.join(root, file)])
 
 def setNextSubFuncUp():
-  global IDX, SUB_IDX00, SUB_FUNCTIONZ00
+  global IDX, SUB_IDX00, SUB_FUNCTIONZ00, SUB_IDX01, SUB_FUNCTIONZ01, SUB_IDX02, SUB_FUNCTIONZ02
   #TODO: consider FUNCTIONZ
   if IDX is 0:
     SUB_IDX00 = SUB_IDX00 + 1
@@ -70,13 +86,21 @@ def setNextSubFuncUp():
       SUB_IDX00 = -1
     sub_string = SUB_FUNCTIONZ00[SUB_IDX00][0] + '\n' + SUB_FUNCTIONZ00[SUB_IDX00][1]
   elif IDX is 1:
-    sub_string = 'WAIT!'
+    SUB_IDX01 = SUB_IDX01 + 1
+    if SUB_IDX01 > len(SUB_FUNCTIONZ01) - 1:
+      SUB_IDX01 = -1
+    sub_string = SUB_FUNCTIONZ01[SUB_IDX01][0] + '\n' + SUB_FUNCTIONZ01[SUB_IDX01][1]
   elif IDX is 2:
-    sub_string = '2 WAIT!'
+    SUB_IDX02 = SUB_IDX02 + 1
+    if SUB_IDX02 > len(SUB_FUNCTIONZ02) - 1:
+      SUB_IDX02 = -1
+    sub_string = SUB_FUNCTIONZ02[SUB_IDX02][0] + '\n' + SUB_FUNCTIONZ02[SUB_IDX02][1]
+  elif IDX is 3:
+    sub_string = 'shutdown -h now'
   return sub_string
 
 def setNextSubFuncDown():
-  global IDX, SUB_IDX00, SUB_FUNCTIONZ00
+  global IDX, SUB_IDX00, SUB_FUNCTIONZ00, SUB_IDX01, SUB_FUNCTIONZ01, SUB_IDX02, SUB_FUNCTIONZ02
   #TODO: consider FUNCTIONZ
   if IDX is 0:
     SUB_IDX00 = SUB_IDX00 - 1
@@ -84,23 +108,33 @@ def setNextSubFuncDown():
       SUB_IDX00 = len(SUB_FUNCTIONZ00) - 1
     sub_string = SUB_FUNCTIONZ00[SUB_IDX00][0] + '\n' + SUB_FUNCTIONZ00[SUB_IDX00][1]
   elif IDX is 1:
-    sub_string = 'WAIT!'
+    SUB_IDX01 = SUB_IDX01 - 1
+    if SUB_IDX01 < 0:
+      SUB_IDX01 = len(SUB_FUNCTIONZ01) - 1
+    sub_string = SUB_FUNCTIONZ01[SUB_IDX01][0] + '\n' + SUB_FUNCTIONZ01[SUB_IDX01][1]
   elif IDX is 2:
-    sub_string = '2 WAIT!'
+    SUB_IDX02 = SUB_IDX02 - 1
+    if SUB_IDX02 < 0:
+      SUB_IDX02 = len(SUB_FUNCTIONZ02) - 1
+    sub_string = SUB_FUNCTIONZ02[SUB_IDX02][0] + '\n' + SUB_FUNCTIONZ02[SUB_IDX02][1]
+  elif IDX is 3:
+    sub_string = 'shutdown -h now'
   return sub_string  
 
 def getCurrentSubFunc():
-  global IDX, SUB_IDX00, SUB_FUNCTIONZ00
+  global IDX, SUB_IDX00, SUB_FUNCTIONZ00, SUB_IDX01, SUB_FUNCTIONZ01, SUB_IDX02, SUB_FUNCTIONZ02
   if IDX is 0:
     sub_string = SUB_FUNCTIONZ00[SUB_IDX00][0] + ' ' + SUB_FUNCTIONZ00[SUB_IDX00][1]
   elif IDX is 1:
-    sub_string = 'WAIT!'
+    sub_string = SUB_FUNCTIONZ01[SUB_IDX01][0] + ' ' + SUB_FUNCTIONZ01[SUB_IDX01][1]
   elif IDX is 2:
-    sub_string = '2 WAIT!'
+    sub_string = SUB_FUNCTIONZ02[SUB_IDX02][0] + ' ' + SUB_FUNCTIONZ02[SUB_IDX02][1]
+  elif IDX is 3:
+    sub_string = 'shutdown -h now'
   return sub_string
 
 def makeSelection(button):
-  global lcd, prev
+  global lcd, prev, SUB_IDX01, SUB_FUNCTIONZ01, SUB_IDX02, SUB_FUNCTIONZ02
   lcd.clear()
   mySleep(0.2)
   lcd.message(prev[1])
@@ -120,10 +154,19 @@ def makeSelection(button):
   #end flash
   lcd.clear()
   lcd.message(getCurrentFunc()+'\n'+getCurrentSubFunc())
-  # mySleep(2)
-  # lcd.clear()
-  # lcd.message('DONE PROCESSING\nMAKE SELECTION')
+
+  print getCurrentSubFunc()
+  # Set up the echo command and direct the output to a pipe
+  p1 = subprocess.Popen([getCurrentSubFunc()], stdout=subprocess.PIPE)
+
+  # Run the command
+  output = p1.communicate()[0]
+  print output
   prev = -1
+
+  lcd.clear()
+  lcd.message(getCurrentSubFunc()+':\n'+output)
+
 
 mySleep(1)
 
@@ -151,33 +194,15 @@ while True:
         break
       elif b[0] is 2: 
         #DOWN
-        print "DONW"
-        print SUB_IDX00
         lcd.clear()
         lcd.message(setNextSubFuncDown())
         prev = b
         mySleep()
-        print SUB_IDX00
         break
       elif b[0] is 3:
         #UP
-        print "UP"
-        print SUB_IDX00
         lcd.clear()
         lcd.message(setNextSubFuncUp())
         prev = b
         mySleep()
-        print SUB_IDX00
         break
-      #this is mostly useless now...  
-      # elif b is not prev:
-      #   lcd.clear()
-      #   lcd.message(b[1])
-      #   lcd.backlight(b[2])
-      #   prev = b
-      #   print b[0]
-      #   mySleep
-      #   break
-    # except TypeError:
-    #   print "ARRRRRG! TYPE ERROR!"
-    #   mySleep()
