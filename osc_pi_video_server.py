@@ -7,10 +7,12 @@ from liblo import *
 import sys, os, subprocess, re, datetime, time, argparse
 
 class OscPiVideoServer(ServerThread):
-    target_addr = '224.0.0.1'
+    #224.0.0.1
+    target_addr = 'e.local'
     target = Address(target_addr,9000)
+
     def __init__(self):
-        ServerThread.__init__(self, 8000)
+        ServerThread.__init__(self, 5000)
         self.osc_grid = OscFileGrid()
         self.labels = OscTxtLabels()
         OscTxtLabels.initP2Labels(self.labels)
@@ -24,11 +26,10 @@ class OscPiVideoServer(ServerThread):
         print(args['host'])
 
     def play_video(self, f):
-        subprocess.Popen(['sudo', 'omxplayer', f])
         OscTxtLabels.setLabel(self.labels, self.hostarg, 'play: '+datetime.datetime.now().strftime("%H:%M:%S"))
-
-
-    @make_method('/1', None)
+        subprocess.Popen(['sudo', 'omxplayer', f])
+        
+    @make_method('/2', None)
     def p1_callback(self, path, args):
         OscFileGrid.initGrid(self.osc_grid)
         OscTxtLabels.initP1Labels(self.labels)
@@ -36,28 +37,28 @@ class OscPiVideoServer(ServerThread):
     
     # 4x4 multipush grid of toggle buttons
     #ROW 1
-    @make_method('/1/multipush1/1/1', None)
+    @make_method('/2/multipush1/1/1', None)
     def l1_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[0]
             self.play_video(f)
             print "label1 GOT A ONE: %s" % f
 
-    @make_method('/1/multipush1/2/1', None)
+    @make_method('/2/multipush1/2/1', None)
     def l2_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[1]
             self.play_video(f)
             print "label2 GOT A ONE!"
 
-    @make_method('/1/multipush1/3/1', None)
+    @make_method('/2/multipush1/3/1', None)
     def l3_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[2]
             self.play_video(f)
             print "label3 GOT A ONE!"
 
-    @make_method('/1/multipush1/4/1', None)
+    @make_method('/2/multipush1/4/1', None)
     def l4_callback(self, path, args):
         if args == [1.0]:
             f=OscFileGrid.getGridItemKeysAtOffset(self.osc_grid, 0)[3]
@@ -65,107 +66,116 @@ class OscPiVideoServer(ServerThread):
             print "label4 GOT A ONE!"
     
     #ROW 2
-    @make_method('/1/multipush1/1/2', None)
+    @make_method('/2/multipush1/1/2', None)
     def l5_callback(self, path, args):
         if args == [1.0]:
             print "label5 GOT A ONE!"
 
-    @make_method('/1/multipush1/2/2', None)
+    @make_method('/2/multipush1/2/2', None)
     def l6_callback(self, path, args):
         if args == [1.0]:
             print "label6 GOT A ONE!"
 
-    @make_method('/1/multipush1/3/2', None)
+    @make_method('/2/multipush1/3/2', None)
     def l7_callback(self, path, args):
         if args == [1.0]:
             print "label7 GOT A ONE!"
 
-    @make_method('/1/multipush1/4/2', None)
+    @make_method('/2/multipush1/4/2', None)
     def l8_callback(self, path, args):
         if args == [1.0]:
             print "label8 GOT A ONE!"
     
     #ROW 3
-    @make_method('/1/multipush1/1/3', None)
+    @make_method('/2/multipush1/1/3', None)
     def l9_callback(self, path, args):
         if args == [1.0]:
             print "label9 GOT A ONE!"
 
-    @make_method('/1/multipush1/2/3', None)
+    @make_method('/2/multipush1/2/3', None)
     def l10_callback(self, path, args):
         if args == [1.0]:
             print "label10 GOT A ONE!"
 
-    @make_method('/1/multipush1/3/3', None)
+    @make_method('/2/multipush1/3/3', None)
     def l11_callback(self, path, args):
         if args == [1.0]:
             print "label11 GOT A ONE!"
 
-    @make_method('/1/multipush1/4/3', None)
+    @make_method('/2/multipush1/4/3', None)
     def l12_callback(self, path, args):
         if args == [1.0]:
             print "label12 GOT A ONE!"
     
     #ROW 4
-    @make_method('/1/multipush1/1/4', None)
+    @make_method('/2/multipush1/1/4', None)
     def l13_callback(self, path, args):
         if args == [1.0]:
             print "label13 GOT A ONE!"
 
-    @make_method('/1/multipush1/2/4', None)
+    @make_method('/2/multipush1/2/4', None)
     def l14_callback(self, path, args):
         if args == [1.0]:
             print "label14 GOT A ONE!"
 
-    @make_method('/1/multipush1/3/4', None)
+    @make_method('/2/multipush1/3/4', None)
     def l15_callback(self, path, args):
         if args == [1.0]:
             print "label15 GOT A ONE!"
 
-    @make_method('/1/multipush1/4/4', None)
+    @make_method('/2/multipush1/4/4', None)
     def l16_callback(self, path, args):
         if args == [1.0]:
             print "label16 GOT A ONE!"
 
-    # UP!
-    @make_method('/1/multipush2/1/1', None)
-    def up_callback(self, path, args):
-        if args == [1.0]:
-            print "UP GOT A ONE!"
-    #DOWN!
-    @make_method('/1/multipush2/1/2', None)
-    def down_callback(self, path, args):
-        if args == [1.0]:
-            print "DOWN GOT A ONE!"
+    # # UP!
+    # @make_method('/2/multipush2/1/1', None)
+    # def up_callback(self, path, args):
+    #     if args == [1.0]:
+    #         print "UP GOT A ONE!"
+    # #DOWN!
+    # @make_method('/2/multipush2/1/2', None)
+    # def down_callback(self, path, args):
+    #     if args == [1.0]:
+    #         print "DOWN GOT A ONE!"
 
 
     #loop
-    @make_method('/1/multipush3/1/1', None)
+    #TODO: make this stop the videoz!
+    @make_method('/2/multipush2/1/1', None)
     def loop_callback(self, path, args):
         if args == [1.0]:
-            print "BG GOT A ONE!"
-            if self.bg_toggle_state:
-                subprocess.Popen('DISPLAY=:0 pcmanfm --wallpaper-mode=color', shell=True)
-            else:
-                subprocess.Popen('DISPLAY=:0 pcmanfm --wallpaper-mode=fit', shell=True)
-            self.bg_toggle_state = not self.bg_toggle_state
+            print "GONNA TRY TO KILL!"
+            # if self.bg_toggle_state:
+            #     subprocess.Popen('DISPLAY=:0 pcmanfm --wallpaper-mode=color', shell=True)
+            # else:
+            #     subprocess.Popen('DISPLAY=:0 pcmanfm --wallpaper-mode=fit', shell=True)
+            # self.bg_toggle_state = not self.bg_toggle_state
+            
+            #Step 2: loop until all children are terminated
+            # while OscPiVideoServer.children:
+            #     #Step 3: poll all active children in order
+            #     print "GONNA KILL: %s" % [popen.pid for popen in OscPiVideoServer.children]
+            #     OscPiVideoServer.children[:] = [child for child in OscPiVideoServer.children if child.kill() is None]
+            #     time.sleep(1)
+            subprocess.Popen(['sudo', 'pkill', 'omxplayer'])
 
     #start
-    @make_method('/1/multipush3/2/1', None)
+    @make_method('/2/multipush2/2/1', None)
     def start_callback(self, path, args):
         if args == [1.0]:
             print "PING!"
             #OscTxtLabels.initP1Labels(self.labels)
             OscTxtLabels.setLabel(self.labels, self.hostarg, 'PING '+self.hostarg+': '+datetime.datetime.now().strftime("%H:%M:%S"))
-
-    #PAGE 2
-    @make_method('/2', None)
+            # OscTxtLabels.initP1Labels(self.labels)
+    #PAGE 3
+    @make_method('/3', None)
     def p2_callback(self, path, args):
         #OscFileGrid.initPage2(self.osc_grid)
         OscTxtLabels.initP1Labels()
         print "ON PAGE TWO!"
 
-    @make_method('/2/toggle3', None)
+    @make_method('/3/toggle3', None)
     def toggle3_callback(self, path, args):
         if args == [1.0]:
             print "TOGG ON!"
@@ -175,7 +185,7 @@ class OscPiVideoServer(ServerThread):
     #/home/pi/videos
     #/2/label85
 
-    @make_method('/2/push4', None)
+    @make_method('/3/push4', None)
     def push4_callback(self, path, args):
         if args == [1.0]:
             print "COPZ GONNA SHUT IT DOWN!"
@@ -197,8 +207,8 @@ class OscFileGrid():
     def __init__(self):
         self.extensions = ('.mov')
         self.grid_size = 16
-        self.total_pages = 1
-        self.current_page = 1
+        self.total_pages = 4
+        self.current_page = 2
         self.index = 0
         self.found_files = {}
         self.found_file_times = {}
@@ -258,7 +268,7 @@ class OscFileGrid():
         labelVal = 0
         for x in range(32):
             labelVal = labelVal + 1
-            label = "/1/label" + str(labelVal)
+            label = "/2/label" + str(labelVal)
             if labelVal % 2 == 0:
                 send(OscPiVideoServer.target, label, '')
             else:
@@ -267,10 +277,10 @@ class OscFileGrid():
         labelVal = 0
         for filename in self.getGridItemValuesAtOffset(0):
             labelVal = labelVal + 1
-            label = "/1/label" + str(labelVal)
+            label = "/2/label" + str(labelVal)
             send(OscPiVideoServer.target, label, filename)
             labelVal = labelVal + 1
-            label = "/1/label" + str(labelVal) 
+            label = "/2/label" + str(labelVal) 
             send( OscPiVideoServer.target, label, str(datetime.timedelta(seconds=self.found_file_times[filename])) )
             print "%s filename: %s" % (label, filename)
 
@@ -284,22 +294,22 @@ class OscTxtLabels():
 
     def initP1Labels(self):
         #ln0 012345678901234567
-        #/1/label44
+        #/2/label44
 
         #66:66
-        #/1/labelCurrent
+        #/2/labelCurrent
 
         #66:66
-        #/1/labelTotal
+        #/2/labelTotal
 
         #ln1 01234567890123456789012345678901234567890123456789012
-        #/1/label41
+        #/2/label41
 
         #ln2
-        #/1/label42
+        #/2/label42
 
         #ln3
-        #/1/label84
+        #/2/label84
 
         labelValz = [44, 'Current', 'Total', 41, 42, 84, 'Loop', 'StartStop', 'Host1', 'Host2', 'Host3', 'Host4']
         for label in labelValz:
@@ -314,7 +324,7 @@ class OscTxtLabels():
             elif label == 'Host1' or label == 'Host2' or label == 'Host3' or label == 'Host4':
                 OscTxtLabels.setLabel(self, label, '')
             elif label == 'Loop':
-                OscTxtLabels.setLabel(self, label, "BG TOGG")
+                OscTxtLabels.setLabel(self, label, "STOP")
             elif label == 'StartStop':
                 OscTxtLabels.setLabel(self, label, 'PING')
 
@@ -330,9 +340,10 @@ class OscTxtLabels():
                 OscTxtLabels.setLabel(self, label, l, 2)
             
 
-    def setLabel(self, whichLabel, val='', whichPage=1):
+    def setLabel(self, whichLabel, val='', whichPage=2):
         send(OscPiVideoServer.target, '/'+str(whichPage)+'/label'+str(whichLabel), val)
         #print "%s filename: %s" % (label, filename)
+        #print "whichLabel:%s  val:%s  whichPage:%s" % (whichLabel, val, whichPage)
 
 
 """
