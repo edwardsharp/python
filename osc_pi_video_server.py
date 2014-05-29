@@ -189,6 +189,7 @@ class OscPiVideoServer(ServerThread):
     def push4_callback(self, path, args):
         if args == [1.0]:
             print "COPZ GONNA SHUT IT DOWN!"
+            subprocess.Popen(['sudo', 'shutdown', '-h', 'now'])
 
     #shutdown -h now
     #/2/label81
